@@ -7,7 +7,7 @@ output: html_document
 
 Introduction and Goal:
 The goal of this notebook is to introduce the concept of linear regression, a fundamental statistical method used for modeling the relationship between a dependent variable and one or more independent variables. We will explore how to implement linear regression in R, interpret the results, and evaluate the model's performance.
-
+# Load necessary libraries and data
 ``` {r loaddata}
 knitr::opts_chunk$set(echo = TRUE)
 library(readr)
@@ -20,11 +20,16 @@ data <- data %>%
     select(median_income, median_house_value)
 
 head(data)
+```
 
-corrr <- cor(data$median_income, data$median_house_value)
+# Exploratory Data Analysis
+``` {r correlation}
+corr <- cor(data$median_income, data$median_house_value)
 
-cat(paste("Pearson Correlation Coefficient:", round(corrr, 4), "\n"))
+cat(paste("Pearson Correlation Coefficient:", round(corr, 4), "\n"))
+```
 
+``` {scatterplot}
 ggplot(data, aes(x = median_income, y = median_house_value)) +
     geom_point(alpha = 0.5) +
     labs(title = "Scatter Plot of Median Income vs. Median House Value",
@@ -32,6 +37,8 @@ ggplot(data, aes(x = median_income, y = median_house_value)) +
          y = "Median House Value") +
     theme_minimal()
 ```
+
+# Linear Regression Model
 ``` {r .linear_regression}
 simple_model <- lm(median_house_value ~ median_income, data = data)
 summary(simple_model)
