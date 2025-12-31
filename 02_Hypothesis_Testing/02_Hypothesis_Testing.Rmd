@@ -1,0 +1,25 @@
+---
+title: "02 Hypothesis Testing"
+author: "Paul Tuccinardi"
+date: "`r Sys.Date() `"
+output: html_document
+---
+
+
+## What is Hypothesis Testing?
+
+Hypothesis Testing is used to compare a group means to determine if they are statistically different. 
+
+There are a few methods for Hypothesis Testings:
+
+### One-sample t-test
+One-sample T-test is used to compare one group mean to a known value
+
+### Independent samples t-test
+Independent t-tests compare 2 separate group means 
+
+### Paired Samples t-test
+Paired Samples t-test compares means of the same group but from before and after certain conditions
+
+
+
