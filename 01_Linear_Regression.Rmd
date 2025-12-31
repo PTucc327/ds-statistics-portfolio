@@ -7,6 +7,7 @@ output: html_document
 
 Introduction and Goal:
 The goal of this notebook is to introduce the concept of linear regression, a fundamental statistical method used for modeling the relationship between a dependent variable and one or more independent variables. We will explore how to implement linear regression in R, interpret the results, and evaluate the model's performance.
+
 # Load necessary libraries and data
 ``` {r loaddata}
 knitr::opts_chunk$set(echo = TRUE)
@@ -51,3 +52,6 @@ ggplot(data, aes(x = median_income, y = median_house_value)) +
          y = "Median House Value") +
     theme_minimal()
 ```
+
+### Results
+The R-squared and Adj. R-squared indicate that 47.3% of the house values can be explained by the income. Another metric in here to consider is the coefficient(coeff) which indicates that as the median income increases there is a 4.509e+04 increase in the house values. Utilizing Linear Regression can provide valuable information which can lead to making various decisions.
