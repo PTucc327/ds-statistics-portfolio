@@ -11,7 +11,7 @@
 
 <meta name="author" content="Paul Tuccinardi" />
 
-<meta name="date" content="2025-12-31" />
+<meta name="date" content="2026-01-11" />
 
 <title>02 Hypothesis Testing</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">02 Hypothesis Testing</h1>
 <h4 class="author">Paul Tuccinardi</h4>
-<h4 class="date">2025-12-31</h4>
+<h4 class="date">2026-01-11</h4>
 
 </div>
 
@@ -375,7 +375,120 @@ value</p>
 <h3>Paired Samples t-test</h3>
 <p>Paired Samples t-test compares means of the same group but from
 before and after certain conditions</p>
+<pre class="r"><code>knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(ggplot2)
+
+data &lt;- read_csv(&quot;housing.csv&quot;)</code></pre>
+<pre><code>## Rows: 20640 Columns: 10</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (1): ocean_proximity
+## dbl (9): longitude, latitude, housing_median_age, total_rooms, total_bedroom...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>head(data)</code></pre>
+<pre><code>## # A tibble: 6 × 10
+##   longitude latitude housing_median_age total_rooms total_bedrooms population
+##       &lt;dbl&gt;    &lt;dbl&gt;              &lt;dbl&gt;       &lt;dbl&gt;          &lt;dbl&gt;      &lt;dbl&gt;
+## 1     -122.     37.9                 41         880            129        322
+## 2     -122.     37.9                 21        7099           1106       2401
+## 3     -122.     37.8                 52        1467            190        496
+## 4     -122.     37.8                 52        1274            235        558
+## 5     -122.     37.8                 52        1627            280        565
+## 6     -122.     37.8                 52         919            213        413
+## # ℹ 4 more variables: households &lt;dbl&gt;, median_income &lt;dbl&gt;,
+## #   median_house_value &lt;dbl&gt;, ocean_proximity &lt;chr&gt;</code></pre>
 </div>
+</div>
+<div id="one-sample-t-test-1" class="section level2">
+<h2>One-sample t-test</h2>
+<pre class="r"><code>x &lt;- data$median_income
+t.test(x, mu = 3)</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  x
+## t = 65.841, df = 20639, p-value &lt; 2.2e-16
+## alternative hypothesis: true mean is not equal to 3
+## 95 percent confidence interval:
+##  3.844751 3.896591
+## sample estimates:
+## mean of x 
+##  3.870671</code></pre>
+<pre class="r"><code>cat(&quot;The mean of median income is:&quot;, mean(x))</code></pre>
+<pre><code>## The mean of median income is: 3.870671</code></pre>
+<pre class="r"><code>cat(&quot;The hypothesized mean is: 3&quot;)</code></pre>
+<pre><code>## The hypothesized mean is: 3</code></pre>
+<pre class="r"><code>cat(&quot;The p-value is:&quot;, t.test(x, mu = 3)$p.value)</code></pre>
+<pre><code>## The p-value is: 0</code></pre>
+<pre class="r"><code>cat(&quot;The t-test statistic is:&quot;, t.test(x, mu = 3)$statistic)</code></pre>
+<pre><code>## The t-test statistic is: 65.84095</code></pre>
+<pre class="r"><code>cat(&quot;This indicates that we reject/fail to reject the null hypothesis. The p-value is less than 0.05, so we reject the null hypothesis. The t-test statistic is greater than 2, which indicates that the sample mean is significantly different from the hypothesized mean of 3.&quot;)</code></pre>
+<pre><code>## This indicates that we reject/fail to reject the null hypothesis. The p-value is less than 0.05, so we reject the null hypothesis. The t-test statistic is greater than 2, which indicates that the sample mean is significantly different from the hypothesized mean of 3.</code></pre>
+</div>
+<div id="independent-samples-t-test-1" class="section level2">
+<h2>Independent samples t-test</h2>
+<pre class="r"><code>x1 &lt;- data$median_income[data$ocean_proximity == &#39;&lt;1H OCEAN&#39;]
+x2 &lt;- data$median_income[data$ocean_proximity == &#39;INLAND&#39;]
+
+n1 &lt;- length(x1)
+n2 &lt;- length(x2)
+
+mean1 &lt;- mean(x1)
+mean2 &lt;- mean(x2)
+std1 &lt;- sd(x1)
+std2 &lt;- sd(x2)
+
+sp &lt;- sqrt(((n1 - 1) * std1^2 + (n2 - 1) * std2^2) / (n1 + n2 - 2))
+
+t_statistic &lt;- (mean1 - mean2) / (sp * sqrt(1/n1 + 1/n2))
+p_value &lt;- 2 * (1 - pt(abs(t_statistic), df=n1 + n2 - 2))
+
+cat(&quot;The mean of group 1 is:&quot;, mean1)</code></pre>
+<pre><code>## The mean of group 1 is: 4.230682</code></pre>
+<pre class="r"><code>cat(&quot;The mean of group 2 is:&quot;, mean2)</code></pre>
+<pre><code>## The mean of group 2 is: 3.208996</code></pre>
+<pre class="r"><code>cat(&quot;The t-test statistic is:&quot;, t_statistic)</code></pre>
+<pre><code>## The t-test statistic is: 35.30369</code></pre>
+<pre class="r"><code>cat(&quot;The p-value is:&quot;, p_value)</code></pre>
+<pre><code>## The p-value is: 0</code></pre>
+</div>
+<div id="paired-samples-t-test-1" class="section level2">
+<h2>Paired Samples t-test</h2>
+<pre class="r"><code># 1. Extract groups
+# Filter for just the two groups we want to compare
+test_data &lt;- data %&gt;%
+  filter(ocean_proximity %in% c(&quot;NEAR OCEAN&quot;, &quot;INLAND&quot;))
+
+before &lt;- test_data$median_house_value[test_data$ocean_proximity == &quot;NEAR OCEAN&quot;]
+after  &lt;- test_data$median_house_value[test_data$ocean_proximity == &quot;INLAND&quot;]
+
+# 2. Perform Independent t-test (paired = FALSE)
+# We use Welch&#39;s t-test by default, which is safer for unequal variances
+results &lt;- t.test(before, after, paired = FALSE)
+
+# 3. Print results
+cat(&quot;The mean of group 1 is:&quot;, mean(before, na.rm = TRUE), &quot;\n&quot;)</code></pre>
+<pre><code>## The mean of group 1 is: 249434</code></pre>
+<pre class="r"><code>cat(&quot;The mean of group 2 is:&quot;, mean(after, na.rm = TRUE), &quot;\n&quot;)</code></pre>
+<pre><code>## The mean of group 2 is: 124805.4</code></pre>
+<pre class="r"><code>cat(&quot;The p-value is:&quot;, results$p.value, &quot;\n&quot;)</code></pre>
+<pre><code>## The p-value is: 0</code></pre>
+<pre class="r"><code>cat(&quot;The t-test statistic is:&quot;, results$statistic, &quot;\n&quot;)</code></pre>
+<pre><code>## The t-test statistic is: 49.29562</code></pre>
+<pre class="r"><code>cat(&#39;The results indicate that we should reject the null hypothesis. The p-value is less than 0.05, suggesting a significant difference between the two group means. The t-test statistic is also greater than 2, further supporting this conclusion.&#39;)</code></pre>
+<pre><code>## The results indicate that we should reject the null hypothesis. The p-value is less than 0.05, suggesting a significant difference between the two group means. The t-test statistic is also greater than 2, further supporting this conclusion.</code></pre>
 </div>
 
 

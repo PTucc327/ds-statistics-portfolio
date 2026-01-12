@@ -21,5 +21,72 @@ Independent t-tests compare 2 separate group means
 ### Paired Samples t-test
 Paired Samples t-test compares means of the same group but from before and after certain conditions
 
+``` {r loaddata}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+data <- read_csv("housing.csv")
+
+head(data)
+```
+
+## One-sample t-test
+``` {r onesamplettest}
+x <- data$median_income
+t.test(x, mu = 3)
+cat("The mean of median income is:", mean(x))
+cat("The hypothesized mean is: 3")
+cat("The p-value is:", t.test(x, mu = 3)$p.value)
+cat("The t-test statistic is:", t.test(x, mu = 3)$statistic)
+cat("This indicates that we reject/fail to reject the null hypothesis. The p-value is less than 0.05, so we reject the null hypothesis. The t-test statistic is greater than 2, which indicates that the sample mean is significantly different from the hypothesized mean of 3.")
+```
+
+## Independent samples t-test
+``` {r independentsamplesttest}
+x1 <- data$median_income[data$ocean_proximity == '<1H OCEAN']
+x2 <- data$median_income[data$ocean_proximity == 'INLAND']
+
+n1 <- length(x1)
+n2 <- length(x2)
+
+mean1 <- mean(x1)
+mean2 <- mean(x2)
+std1 <- sd(x1)
+std2 <- sd(x2)
+
+sp <- sqrt(((n1 - 1) * std1^2 + (n2 - 1) * std2^2) / (n1 + n2 - 2))
+
+t_statistic <- (mean1 - mean2) / (sp * sqrt(1/n1 + 1/n2))
+p_value <- 2 * (1 - pt(abs(t_statistic), df=n1 + n2 - 2))
+
+cat("The mean of group 1 is:", mean1)
+cat("The mean of group 2 is:", mean2)
+cat("The t-test statistic is:", t_statistic)
+cat("The p-value is:", p_value)
+
+```
 
 
+## Paired Samples t-test
+``` {r pairedsamplesttest}
+# 1. Extract groups
+# Filter for just the two groups we want to compare
+test_data <- data %>%
+  filter(ocean_proximity %in% c("NEAR OCEAN", "INLAND"))
+
+before <- test_data$median_house_value[test_data$ocean_proximity == "NEAR OCEAN"]
+after  <- test_data$median_house_value[test_data$ocean_proximity == "INLAND"]
+
+# 2. Perform Independent t-test (paired = FALSE)
+# We use Welch's t-test by default, which is safer for unequal variances
+results <- t.test(before, after, paired = FALSE)
+
+# 3. Print results
+cat("The mean of group 1 is:", mean(before, na.rm = TRUE), "\n")
+cat("The mean of group 2 is:", mean(after, na.rm = TRUE), "\n")
+cat("The p-value is:", results$p.value, "\n")
+cat("The t-test statistic is:", results$statistic, "\n")
+cat('The results indicate that we should reject the null hypothesis. The p-value is less than 0.05, suggesting a significant difference between the two group means. The t-test statistic is also greater than 2, further supporting this conclusion.')
+``` 
