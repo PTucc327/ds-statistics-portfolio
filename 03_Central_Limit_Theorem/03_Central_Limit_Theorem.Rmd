@@ -1,0 +1,43 @@
+---
+title: "03 Central Limit Theorem"
+author: "Paul Tuccinardi"
+date: "`r Sys.Date() `"
+output: html_document
+---
+
+## What is the Central Limit Theorem?
+The Central Limit Theorem (CLT) states that the sampling distribution of the sample mean approaches a normal distribution as the sample size increases, regardless of the population's distribution shape. This theorem is fundamental in statistics because it allows us to make inferences about population parameters using sample statistics.
+### Key Points of the Central Limit Theorem
+1. **Sample Size**: The CLT holds true for sufficiently large sample sizes, typically
+    n ≥ 30 is considered adequate.
+2. **Independence**: The samples must be independent of each other.
+3. **Population Distribution**: The CLT applies regardless of the population's distribution shape, whether it is normal, skewed, or uniform.
+
+``` {r loaddata}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(ggplot2)
+data <- read_csv("housing.csv")
+head(data)
+set.seed(123) # For reproducibility
+```
+
+## Demonstrating the Central Limit Theorem
+To illustrate the Central Limit Theorem, we will take multiple samples of different sizes from the 
+'median_income` variable in the housing dataset and observe the distribution of the sample means.
+
+``` {r clt_demo}
+sample_sizes <- c(5, 30, 100)
+par(mfrow = c(1, 3)) # Set up the plotting area
+for (n in sample_sizes) {
+  sample_means <- replicate(1000, mean(sample(data$median_income, n, replace = TRUE)))
+  hist(sample_means, main = paste("Sample Size =", n), xlab = "Sample Means", col = "lightblue", border = "black")
+}
+par(mfrow = c(1, 1)) # Reset plotting area
+```
+
+## What can this tell us?
+Using a smaller sample size like 5 in our example can be too small and show a very skewed portion of the data leading to insights that may not necessarily be true about our data. Looking at larger sample sizes like n = 100 can lead to a better assessment and a more precise estimate of the population mean.
+
+
